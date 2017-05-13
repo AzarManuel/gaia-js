@@ -1,0 +1,234 @@
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Gaia - La Vida</title>
+	<link href="css/bootstrap.css" rel="stylesheet" type="text/css">
+	<link href="css/stylesheet.css" rel="stylesheet" type="text/css">
+	<link href="css/bootstrap-datetimepicker.min.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+	<div class="bottomLeft">
+		<p id="dateInfo" style="display:none;">
+			month: <span id="mon"></span><br>
+			day: <span id="day"></span><br>
+			hour: <span id="hour"></span><br>
+			min: <span id="min"></span>
+		</p>
+		<p style="margin-bottom:20px;">	Lat: <span id="lat"></span><br>
+			Long: <span id="long"></span><br></p>
+		<div style="text-decoration:none;cursor:pointer;" id="dateLaunch"><img src="img/time_date.png" alt="Time & Date" ><br><span>time/date</span></a></div>
+		<div onClick="printTerrain()"><img src="img/print.png" alt="Print"><br><span>print</span></div>
+		<a href="http://www.la-vida.com/modl"><img src="img/la-vida.png" alt="La Vida"><br><span>home</span></a>
+		<a href="capture.html" style="text-decoration:none;"><img src="img/load.png" alt="Load" width="80px" height="64px"><br><span>site</span></a>
+	</div>
+	<div class="bRight2">
+		<div id="sunPause" style="display:none;" ><div class="sunPause" onClick="pauseSun()"></div><span id="sunSpan">Stop</span></div>
+		<div id="runoffPause" style="display:none;"><div class="runoffPause" onClick="pauseRunoff()"></div><span id="runoffSpan">Flow</span></div>
+		<div id="contactSel" style="display:none;"><div class="contactSel" onClick="changeWind()"></div><span id="contactSpan">Wind</span></div>
+	</div>
+	<div class="bottomRight">
+		<ul style="display:none;" class="slopeClass" id="slopeClass">
+			<li><span class="flat">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>0%&nbsp;&nbsp; - 10%</li>
+			<li><span class="slight">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>10% - 20%</li>
+			<li><span class="med">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>20% - 40%</li>
+			<li><span class="steep">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>40% - 80%</li>
+			<li><span class="drop">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>80% plus</li>
+		</ul>
+		<div onClick="resetCamera()" style="cursor:pointer;"><img src="img/recenter.png" alt="Recenter" width="64px" height="64px"><br><span>recenter</span></div>
+	</div>
+	<div class="leftControls">
+		<ul style="list-style: none; margin-left:-40px;text-align:center">
+			<li><button type="button" id="contourBtn" class="btn btn-default contour"></button><br>Contours</li>
+			<li><button type="button" id="exposureBtn" class="btn btn-default exposure"></button><br>Runoff</li>
+			<li><button type="button" id="gridBtn" class="btn btn-default grid"></button><br>Grid</li>
+			<li><button type="button" id="slopeBtn" class="btn btn-default slope"></button><br>Slopes</li>
+		</ul>
+	</div>
+	<div class="rightControls">
+		<ul style="list-style: none;text-align:center;">
+			<li><button type="button" id="fillBtn" class="btn btn-default sunlight"></button><br>Sunlight</li>
+			<li><button type="button" id="runoffBtn"class="btn btn-default runoff"></button><br>Drainage</li>
+			<li><button type="button" id="soilsBtn"class="btn btn-default soils"></button><br>Soils</li>
+			<li><button type="button" id="contactBtn"class="btn btn-default contacts"></button><br>Contacts</li>
+		</ul>
+	</div>
+	<div class="bottomCenter">(c) La Vida, 2015</div>
+	<div id="myModal" class="modal fade" role="dialog">
+		<div class="modal-dialog">
+			<!-- Modal content-->
+			<div class="modal-content">
+				<div class="modal-body">
+					<form class="form-horizontal" id="dateForm" method="post" role="form">
+						<div class="row text-center">
+							<div class="col-xs-offset-2 col-xs-8 col-xs-offset-2">
+								<div class="form-group">
+									<h3>Select CSV File provided by the <a href="capture.html" style="color:#0055ff;">Elevation Reader</a></h3><br>
+									<input type="file" id="files" name="files[]"/>
+									<output id="list"></output>
+									<hr>
+									<h3>or try our example captures:</h3
+									>
+									<ul style="text-align: left;font-size: 20px;">
+										<li><a href="Gaia_Mochima.html" style="color:#226600;">Mochima, Venezuela</a></li>
+										<li><a href="Gaia_Sausalito.html" style="color:#226600;">Sausalito, Bay Area</a></li>
+										<li><a href="Gaia_Naiguata.html" style="color:#226600;">Naiguatá, Venezuela</a></li>
+										<li><a href="Gaia_NorthSlopes.html" style="color:#226600;">North Slopes, Vancouver</a></li>
+										<li><a href="Gaia_launch.html" style="color:#226600;">Puerto Francés, Venezuela</a></li>
+										<li><a href="Gaia_Turiamo.html" style="color:#226600;">Turiamo, Venezuela</a></li>
+									</ul>
+								</div>
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="dateModal" class="modal fade" role="dialog">
+		<div class="modal-dialog">
+
+			<!-- Modal content-->
+			<div class="modal-content">
+				<div class="modal-body">
+					<form class="form-horizontal" id="dateForm" method="post" role="form">
+						<div class="row text-center">
+							<div class="col-xs-offset-2 col-xs-8 col-xs-offset-2">
+								<div class="form-group">
+									<h3 id="typeText">Select Date</h3>
+									<div class='input-group date' id='datetimepicker1'>
+										<input type='text' class="form-control" id="dateValue"/>
+										<span class="input-group-addon">
+											<span class="glyphicon glyphicon-calendar"></span>
+										</span>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="row text-center" id="sendButton">
+							<input type="submit" class="btn btn-default" value="Go">
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="windModal" class="modal fade" role="dialog">
+	  <div class="modal-dialog">
+
+	    <!-- Modal content-->
+	    <div class="modal-content">
+	      <div class="modal-body">
+	        <div class="row">
+	        	<center><h3>Select Wind Direction</h3><center>
+				<div class="demo" style="margin-top: 20px;">
+			        <input style="width: 79px; height: 50px;border: 0px none; background: transparent none repeat scroll 0% 0%; font: bold 30px Verdana; text-align: center; color: rgb(68, 68, 68); padding: 0px;margin:0 auto;" class="knob" data-width="150" data-cursor="true" data-min="0" data-max="360" data-bgcolor="#D1E0E0"  data-fgcolor="#00B0EB" data-thickness=".2" data-value="60" value="60" style="color: rgb(68, 68, 68);" data-linecap="round" data-displayPrevious=true>
+			    </div>
+	        </div>
+	        <div class="row text-center" id="sendButton" style="margin-top: 20px;">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+			</div>
+	      </div>
+	    </div>
+
+	  </div>
+	</div>
+	<script type="text/javascript">
+		var read; var alt = [],
+				min_long, max_long,
+				min_lat, max_lat, cols, rows;
+	</script>
+	<script src="js/jquery.min.js"></script>
+	<script src="js/jquery.knob.js"></script>
+	<script src="js/moment.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	<script src="js/bootstrap-datetimepicker.min.js"></script>
+	<script src="js/three.js"></script>
+	<script src="js/threex.windowresize.js"></script>
+	<script src="js/OrbitControls.js"></script>
+	<script src="js/stats.js"></script>
+	<!--<script src="captures/js/PF_32.js"></script>-->
+	<script src="libs/setup.js"></script>
+	<script src="libs/main.js"></script>
+	<script src="libs/gui.js"></script>
+	<script src="libs/draw_routines.js"></script>
+	<script src="libs/sunpos.js"></script>
+	<script src="libs/cloud-soils.js"></script>
+	<script src="libs/diagram.js"></script>
+	<script src="libs/landform.js"></script>
+	<script src="libs/base.js"></script>
+	<script src="libs/contours.js"></script>
+	<script src="libs/slope.js"></script>
+	<script src="libs/runoff.js"></script>
+	<script src="libs/drainage.js"></script>
+	<script>
+
+		$(window).load(function(){
+			/*$('#myModal').modal({backdrop: 'static', keyboard: false});*/
+			console.log(sessionStorage.csv);
+			setupCapture(sessionStorage.csv);
+			//init();
+		});
+
+		function initBaseDimensions(dimensions){
+			for(var i = 0; i < dimensions.columns; i++){ //Columns
+				for(var j = 0; j < dimensions.rows; j++){ //Rows
+					alt.push(new Array(0));
+				}
+			}
+		}
+
+
+		function setupCapture(csv){
+			var n = 0, m = 0, val = [], d2r = 3.1416/180
+			var CSVArray = csv.split(',');
+
+            min_long = parseFloat(CSVArray[0]), max_long = parseFloat(CSVArray[1]), min_lat = parseFloat(CSVArray[2]), cols = parseFloat(CSVArray[4]), rows = parseFloat(CSVArray[3])
+
+			initBaseDimensions({columns: CSVArray[4], rows: CSVArray[3]})
+
+
+			for (n = 0; n < CSVArray.length; n++) {
+                val[n] =  parseFloat(CSVArray[n]);
+				if (n >= 5) { m = n -5;
+					var co = m % val[4], ro = Math.trunc(m / val[4])
+					alt[ro][co] = val[n];
+				}
+			}
+
+
+
+			square = 1200/cols
+			aspect_ratio = rows/cols;
+			lat_fac = 111*Math.cos(d2r*min_lat)*1000
+			site_width = (max_long -min_long)*lat_fac
+			//console.log("site_width Launch ", site_width);
+			site_depth = site_width*aspect_ratio;
+			max_lat = min_lat +(site_depth/lat_fac);
+			latitude = (max_lat+min_lat)/2, longitude = (max_long+min_long)/2;
+			vs = 1500/site_width;
+            ofx = (cols)*square/2, ofy = (rows)*square/2;
+			Cx = ofx +840, Cy = ofy -360, Cz = 0;
+			jundawn = 6*Math.cos(latitude*d2r);
+			decdawn = 6 +6*Math.abs(Math.sin(latitude*d2r));
+			difdawn = decdawn -jundawn, hrinit = 9;
+			/** / console.log("rows :", rows, "cols :", cols, "square: ", square, "ofy: ", ofy, "ofx: ", ofx);
+			 console.log("val length: ", val.length, "rows: ", rows, "aspect_ratio: ", aspect_ratio)
+			 console.log("min_long: ", min_long.toFixed(4), " max_long: ", max_long.toFixed(4), " val ", val[0]);
+			 console.log("min_lat: ", min_lat.toFixed(4), " max_lat: ", max_lat.toFixed(4));
+			 console.log("site_width: ", site_width, " site_depth: ", site_depth);/**/
+			$('#myModal').modal('hide');
+			/** / for(var n = cols-2; n <= cols;n++)
+				for(var m = rows-5; m <= rows; m++)
+					console.log("col: ", n,"row: ", m, "alt: ", alt[m][n])
+			/**/
+			init();
+		}
+		//	        console.log("ln_array: ", ln_array, "rows: ", rows, "aspect_ratio: ", aspect_ratio)
+
+		window.onbeforeunload = function() {
+			localStorage.removeItem('csv');
+			return '';
+		};
+	</script>
+</body>
+</html>

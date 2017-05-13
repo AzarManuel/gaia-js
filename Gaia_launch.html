@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Gaia - La Vida</title>
+	<link href="css/bootstrap.css" rel="stylesheet" type="text/css">
+	<link href="css/stylesheet.css" rel="stylesheet" type="text/css">
+	<link href="css/bootstrap-datetimepicker.min.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+	<div class="bottomLeft">
+		<p id="dateInfo" style="display:none;">
+			month: <span id="mon"></span><br> 
+			day: <span id="day"></span><br>
+			hour: <span id="hour"></span><br>
+			min: <span id="min"></span>
+		</p>
+		<p style="margin-bottom:20px;">	Lat: <span id="lat"></span><br> 	
+			Long: <span id="long"></span><br></p>
+		<div style="text-decoration:none;cursor:pointer;" id="dateLaunch"><img src="img/time_date.png" alt="Time & Date" ><br><span>time/date</span></a></div>
+		<div onClick="printTerrain()"><img src="img/print.png" alt="Print"><br><span>print</span></div>
+		<a href="http://www.la-vida.com/modl"><img src="img/la-vida.png" alt="La Vida"><br><span>home</span></a>
+		<a href="Gaia_load.html" style="text-decoration:none;"><img src="img/load.png" alt="Load" width="80px" height="64px"><br><span>site</span></a>
+	</div>
+	<div class="bRight2">
+		<div id="sunPause" style="display:none;" ><div class="sunPause" onClick="pauseSun()"></div><span id="sunSpan">Stop</span></div>	
+		<div id="runoffPause" style="display:none;"><div class="runoffPause" onClick="pauseRunoff()"></div><span id="runoffSpan">Flow</span></div>
+		<div id="contactSel" style="display:none;"><div class="contactSel" onClick="changeWind()"></div><span id="contactSpan">Wind</span></div>
+	</div>
+	<div class="bottomRight">
+		<ul style="display:none;" class="slopeClass" id="slopeClass">
+			<li><center>Slope Classes</center></li>
+			<li><span class="flat">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>0%&nbsp;&nbsp; - 10%</li>
+			<li><span class="slight">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>10% - 20%</li>
+			<li><span class="med">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>20% - 40%</li>
+			<li><span class="steep">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>40% - 80%</li>
+			<li><span class="drop">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>80% plus</li>
+		</ul>
+		<div onClick="resetCamera()" style="cursor:pointer;"><img src="img/recenter.png" alt="Recenter" width="64px" height="64px"><br><span>recenter</span></div>
+	</div>
+	<div class="leftControls">
+		<ul style="list-style: none; margin-left:-40px;text-align:center">
+			<li><button type="button" id="contourBtn" class="btn btn-default contour"></button><br>Contours</li>
+			<li><button type="button" id="exposureBtn" class="btn btn-default exposure"></button><br>Runoff</li>
+			<li><button type="button" id="gridBtn" class="btn btn-default grid"></button><br>Grid</li>
+			<li><button type="button" id="slopeBtn" class="btn btn-default slope"></button><br>Slopes</li>
+		</ul>	
+	</div>
+	<div class="rightControls">
+		<ul style="list-style: none;text-align:center;">
+			<li><button type="button" id="fillBtn" class="btn btn-default sunlight"></button><br>Sunlight</li>
+			<li><button type="button" id="runoffBtn"class="btn btn-default runoff"></button><br>Drainage</li>
+			<li><button type="button" id="soilsBtn"class="btn btn-default soils"></button><br>Soils</li>
+			<li><button type="button" id="contactBtn"class="btn btn-default contacts"></button><br>Contacts</li>
+		</ul>
+	</div>
+	<div class="bottomCenter">
+		<center>(c) La Vida, 2015</center>
+	</div>
+	<div id="dateModal" class="modal fade" role="dialog">
+		<div class="modal-dialog">
+
+			<!-- Modal content-->
+			<div class="modal-content">
+				<div class="modal-body">
+					<form class="form-horizontal" id="dateForm" method="post" role="form">
+						<div class="row text-center">
+							<div class="col-xs-offset-2 col-xs-8 col-xs-offset-2">
+								<div class="form-group">
+									<h3 id="typeText">Select Date</h3>
+									<div class='input-group date' id='datetimepicker1'>
+										<input type='text' class="form-control" id="dateValue"/>
+										<span class="input-group-addon">
+											<span class="glyphicon glyphicon-calendar"></span>
+										</span>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="row text-center" id="sendButton">
+							<input type="submit" class="btn btn-default" value="Go">
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="aboutModal" class="modal fade" role="dialog" >
+		<div class="modal-dialog">
+			<!-- Modal content-->
+			<div class="modal-content">
+				<div class="modal-body">
+					<div class="row">
+							<div class="form-group" id="aboutext"style="text-align:justified;">
+							<center><p class="aboutHeader">ABOUT</p></center>
+							<p>Gaia is a site modelling system which allows the user to read
+							elevation data for any site, directly from Google Maps, and
+							then processes this information to build a 3D terrain model
+							which illustrates dynamic patterns of environmental factors.</p>
+							<p>The elevation data, acquired through the Endeavour Shuttle
+							SRTM (Radar Terrain Mapping) missions provided by NASA.</p>
+							<center><p class="aboutHeader"> DISCLAIMER</p></center>
+							<p>This system is a coarse first approximation towards simulating
+							environmental processes. It was made for educational purposes.</p>
+							<p>It may not be used for legal, planning or commercial matters.</p>
+							<p>The authors make no claims as to its exactness or reliability.
+							Interested users may apply it under their sole responsibility
+							</p>
+							<center><p class="aboutHeader">TEAM</p></center>
+							<ul>
+								<li>Guy Pommares</li>
+								<li>Luis Rodriguez</li>
+								<li>Manuel Azar</li>
+							</ul>
+							<p>&nbsp;&nbsp;with thanks to:
+							<ul>
+								<li>Ignacio Chacartegui</li>
+								<li>River Allen</li>
+							</ul>
+							</div>
+					</div>
+					<div class="row text-center" id="sendButton" style="margin-top: 40px;">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Accept</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="windModal" class="modal fade" role="dialog">
+	  <div class="modal-dialog">
+	    <!-- Modal content-->
+	    <div class="modal-content">
+	      <div class="modal-body">
+	        <div class="row">
+	        	<center><h3>Select Wind Direction</h3><center>
+				<div class="demo" style="margin-top: 20px;">
+			        <input style="width: 79px; height: 50px;border: 0px none; background: transparent none repeat scroll 0% 0%; font: bold 30px Verdana; text-align: center; color: rgb(68, 68, 68); padding: 0px;margin:0 auto;" class="knob" data-width="150" data-cursor="true" data-min="0" data-max="360" data-bgcolor="#D1E0E0"  data-fgcolor="#00B0EB" data-thickness=".2" data-value="60" value="60" style="color: rgb(68, 68, 68);" data-linecap="round" data-displayPrevious=true>
+			    </div>
+	        </div>
+	        <div class="row text-center" id="sendButton" style="margin-top: 20px;">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Go</button>
+			</div>
+	      </div>
+	    </div>
+
+	  </div>
+	</div>
+</body>
+	<script type="text/javascript">
+	var read; var alt = [],
+	min_long = -66.069, max_long = -66.042, 
+	min_lat = 10.562, max_lat = 10.589, cols = 32, rows = 32;
+	console.log(Date.now());
+	</script>
+	<script src="js/jquery.min.js"></script>
+	<script src="js/moment.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	<script src="js/bootstrap-datetimepicker.min.js"></script>
+	<script src="js/three.js"></script>
+	<script src="js/threex.windowresize.js"></script>
+	<script src="js/OrbitControls.js"></script>
+	<script src="js/stats.js"></script>
+	<script src="js/jquery.knob.js"></script>
+	<script src="captures/js/PF_32.js"></script>
+	<script src="libs/setup.js"></script>
+	<script src="libs/main.js"></script>
+	<script src="libs/gui.js"></script>
+	<script src="libs/draw_routines.js"></script>
+	<script src="libs/sunpos.js"></script>
+	<script src="libs/cloud-soils.js"></script>
+	<script src="libs/diagram.js"></script>
+	<script src="libs/landform.js"></script>
+	<script src="libs/base.js"></script>
+	<script src="libs/contours.js"></script>
+	<script src="libs/slope.js"></script>
+	<script src="libs/runoff.js"></script>
+	<script src="libs/drainage.js"></script>
+	<script>
+	$( document ).ready(
+	$(window).load(function(){
+		init();
+		$('#aboutModal').modal({ backdrop: 'static', keyboard: false })
+		THREEx.WindowResize(renderer,camera)	
+        $(".knob").knob({
+            change : function (value) {
+                //console.log("change : " + value);
+            },
+            release : function (value) {
+                //console.log(this.$.attr('value'));
+                wind = value;
+                value = value + ""
+                console.log("release : " + value);
+            },
+            cancel : function () {
+                console.log("cancel : ", this);
+            },
+            /*format : function (value) {
+                return value + '%';
+            },*/
+            draw : function () {
+
+                // "tron" case
+                if(this.$.data('skin') == 'tron') {
+
+                    this.cursorExt = 0.3;
+
+                    var a = this.arc(this.cv)  // Arc
+                        , pa                   // Previous arc
+                        , r = 1;
+
+                    this.g.lineWidth = this.lineWidth;
+
+                    if (this.o.displayPrevious) {
+                        pa = this.arc(this.v);
+                        this.g.beginPath();
+                        this.g.strokeStyle = this.pColor;
+                        this.g.arc(this.xy, this.xy, this.radius - this.lineWidth, pa.s, pa.e, pa.d);
+                        this.g.stroke();
+                    }
+
+                    this.g.beginPath();
+                    this.g.strokeStyle = r ? this.o.fgColor : this.fgColor ;
+                    this.g.arc(this.xy, this.xy, this.radius - this.lineWidth, a.s, a.e, a.d);
+                    this.g.stroke();
+
+                    this.g.lineWidth = 2;
+                    this.g.beginPath();
+                    this.g.strokeStyle = this.o.fgColor;
+                    this.g.arc( this.xy, this.xy, this.radius - this.lineWidth + 1 + this.lineWidth * 2 / 3, 0, 2 * Math.PI, false);
+                    this.g.stroke();
+
+                    return false;
+                }
+            }
+        });
+	}));
+
+	</script>
+</html>

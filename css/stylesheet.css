@@ -1,0 +1,215 @@
+body{
+	background: gray url("../img/PF_bg.png") center no-repeat;
+}
+.controlInfo{
+	position: absolute;
+	bottom: 40px;
+	left: 50px;
+	font-size: 24px;
+}
+.bottomLeft{
+	position: absolute;
+	z-index: 99;
+	bottom: 16px;
+	left: 20px;
+	text-align:center
+	color:#000;
+}
+a,a:visited,a:hover{
+	color:#333;
+}
+.bottomLeft>div,.bottomLeft>a,.bottomLeft>a:visited{
+	display:inline-block;
+	cursor:pointer;
+	text-align: center;
+	text-decoration: none;
+}
+.bottomRight{
+	position: absolute;
+	z-index: 99;
+	bottom: 15px;
+	right: 20px;
+	text-align: center;
+	width: 126px;
+}
+.modal-content{
+	background-color: #807E79;
+}
+
+.topText{
+    position: absolute;
+	top: 30px;
+	left: 45px;
+	color: black;
+	font-size: 13px;
+	font-family: Verdana }
+.bottomText{
+	position: absolute;
+	bottom: 30px;
+	left: 45px;
+	color: black;
+	font-size: 13px;
+	font-family: Verdana 
+}
+.topText{
+    position: absolute;
+	top: 30px;
+	left: 90px;
+	color: black;
+	font-size: 13px;
+	font-family: Verdana }
+.bottomText{
+	position: absolute;
+	bottom: 30px;
+	left: 90px;
+	color: black;
+	font-size: 13px;
+	font-family: Verdana 
+}
+
+.leftControls{
+	position: absolute;
+	top:20px;
+	left:10px;
+}
+
+.rightControls{
+	position: absolute;
+	top:20px;
+	right:10px;
+}
+
+.rightControls>ul>li>button,.leftControls>ul>li>button,.leftControls>ul>li>a>button,.bottomRight>ul>li>button{
+	width: 75px;
+	height: 45;
+	margin: 0px auto 5px;
+	padding: 1px;
+	border-radius: 9px;
+	border-color: #666;
+	border-width: 3px;
+	margin-bottom: 1px;
+	background-size:cover;
+}
+
+.btn.btn-default.load{
+	background-image: url("../img/load.png");
+}
+
+.btn.btn-default.grid{
+	background-image: url("../img/grid_on.png");
+}
+
+.btn.btn-default.contour{
+	background-image: url("../img/contours_off.png");
+}
+
+.btn.btn-default.contacts{
+	background-image: url("../img/contact_off.png");
+}
+
+.btn.btn-default.soils{
+	background-image: url("../img/soils_off.png");
+}
+
+.btn.btn-default.sunlight{
+	background-image: url("../img/sun_off.png");
+}
+
+.btn.btn-default.slope{
+	background-image: url("../img/slope_off.png");
+}
+
+.btn.btn-default.exposure{
+	background-image: url("../img/exposure_off.png");
+}
+
+.slopeClass{
+	background:#aaaaaa;
+	padding:10px;
+	list-style: none;
+	text-align: left;
+}
+.slopeClass>li>span{
+	margin-right: 5px;
+}
+.flat{
+	background-color:#ee7711;
+}
+.slight{
+	background-color:#bb7711;
+}
+.med{
+	background-color:#887711;
+}
+.steep{
+	background-color:#446611;
+}
+.drop{
+	background-color:#225511;
+}
+.bRight2{
+	position: absolute;
+	z-index: 99;
+	bottom: 15px;
+	right: 140px;
+	display: table;
+}
+.bRight2>div{
+	display: table-cell;
+	width: 50px;
+	height: 50px;
+	vertical-align: middle;
+	text-align: center;
+	cursor: pointer;
+}
+.sunPause{
+	background-color: #E6E600;
+	border-radius: 100%;
+	width: 30px;
+	height: 30px;
+	margin: 0px auto 7px;
+}
+.runoffPause{
+	background-color: #223377;
+	border-radius: 100%;
+	width: 30px;
+	height: 30px;
+	margin: 0px auto 7px;
+}
+.contactSel{
+	background-color: #dddddd;
+	border-radius: 100%;
+	width: 30px;
+	height: 30px;
+	margin: 0px auto 7px;
+}
+#aboutext{
+	width: 460px;
+	margin: 0px auto;
+	text-align: justify;
+	overflow-y: scroll;
+	height: 240px;
+	padding: 20px;
+}
+
+.bottomCenter{
+position: absolute;
+z-index: 10;
+text-align: center;
+width: 100%;
+bottom: 15px;
+}
+div.demo {
+    text-align: center;
+    width: 280px;
+    margin: 0 auto;
+}
+
+.aboutHeader{
+	font-weight: bold;
+	color: #AAA;
+}
+.btn.btn-default{
+  background-color: #86AAB6;
+  border-color: #777;
+}
