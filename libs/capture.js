@@ -1,17 +1,18 @@
-// This script grabs elevation data through the google maps api.
-// Author: Guy Pommares, Manuel Azar, River Allen
-// Copyright 2014
-
+/**
+ * This script grabs elevation data through the google maps api.
+ * Author: Guy Pommares, Manuel Azar, River Allen
+ * Copyright 2014
+ */
 var Capture = (function () {
     const COLS = 33, // fixed number of data points across
         ROWS_PER_SLICE = 8, // size of capture slice
-        DEFAULT_PLACE = {
+        DEFAULT_PLACE = { //Starting map coordinates
             'top': 10.588, //max latitude
             'bottom': 10.564, //min latitude
             'left': -66.070, //min longitude
             'right': -66.046 //max longitude
         },
-        MAP_OPTIONS = {
+        MAP_OPTIONS = { //Map Options
             mapTypeId: 'terrain',
             disableDoubleClickZoom: true,
             disableDefaultUI: true,
@@ -25,7 +26,7 @@ var Capture = (function () {
                 position: google.maps.ControlPosition.TOP_RIGHT
             }
         },
-        DRAW_OPTIONS = {
+        DRAW_OPTIONS = { //Drawing manager options
             drawingMode: google.maps.drawing.OverlayType.RECTANGLE,
             drawingControl: true,
             drawingControlOptions: {
@@ -42,25 +43,38 @@ var Capture = (function () {
             }
         };
 
-//DOM Caching
-    var captureBtn = document.getElementById('captureBtn'),
-        abortBtn = document.getElementById('abortBtn'),
-        legend = document.getElementById('legend'),
-        leftInfo = document.getElementById("leftInfo"),
-        textOutput = document.getElementById('textOutput'),
-        searchbar = document.getElementById('pac-input'),
+        //DOM Caching
+    var $capture = document.getElementById('captureBtn'),
+        $abort = document.getElementById('abortBtn'),
+        $bottomCenter = document.getElementById("bottomCenter"),
+        $output = document.getElementById('textOutput'),
+        $searchBar = document.getElementById('pac-input'),
 
+        //Initialize Google maps services
+        elevationApi = new google.maps.ElevationService(), //Define elevation service
+        map = new google.maps.Map(document.getElementById('map-canvas'), MAP_OPTIONS), //Create Map Object
+        drawingManager = new google.maps.drawing.DrawingManager(DRAW_OPTIONS), // Create Drawing Manager
+        placesSearch = new google.maps.places.SearchBox($searchBar),// Create the search box and link it to the UI element.;
 
-        elevator, map, drawingManager,
+        //Initialize loading bar
         loader = progressBar(),
         loaderWrapper = loader.getDiv(),
 
         capture, numberOfRows, slices, sliceHeight,
-        rectangle, infoWindow, width, height, spacing,
+        rectangle, width, height, spacing,
         minLng, maxLng, minLat, maxLat,
-        timerId, q, searchBox;
+        timerId, rectangleRatio;
 
-    google.maps.event.addDomListener(window, 'load', initMap);
+    //Add buttons to control bar
+    map.controls[google.maps.ControlPosition.LEFT_TOP].push($output);
+    map.controls[google.maps.ControlPosition.TOP_CENTER].push($capture);
+    map.controls[google.maps.ControlPosition.TOP_CENTER].push($abort);
+    map.controls[google.maps.ControlPosition.LEFT_TOP].push(loaderWrapper);
+    map.controls[google.maps.ControlPosition.TOP_LEFT].push($searchBar);
+    map.controls[google.maps.ControlPosition.BOTTOM_CENTER].push($bottomCenter); //Bottom Center Text
+    drawingManager.setMap(map); // Loading the drawing Tool in the Map.
+
+    google.maps.event.addDomListener(window, 'load', initEvents);
 
     /**
      * Fetch CSV Slice to Capture
@@ -77,8 +91,8 @@ var Capture = (function () {
     function setDimensions() {
         width = maxLng - minLng;         // horizontal capture limits
         height = maxLat - minLat;       // vertical capture limits
-        q = height / width;               // capture rectangle ratio
-        numberOfRows = Math.trunc(COLS * q);      // proportional number of rows
+        rectangleRatio = height / width;               // capture rectangle ratio
+        numberOfRows = Math.trunc(COLS * rectangleRatio);      // proportional number of rows
         slices = Math.ceil(numberOfRows / ROWS_PER_SLICE); // number of slices
         sliceHeight = height / slices;  // height of each slice
         spacing = width / COLS;            // The geographical distance between data points
@@ -89,24 +103,23 @@ var Capture = (function () {
      * Display capture aspect ratio
      */
     function showAspectRatio() {
-        textOutput.innerHTML = '<h2>columns ' + COLS + ',  aspect ratio ' + Math.round(100 * q) + '%<br><h2>'
+        $output.innerHTML = '<h2>columns ' + COLS + ',  aspect ratio ' + Math.round(100 * rectangleRatio) + '%<br><h2>'
     }
 
     /**
      * Start to capture the elevation data
      */
     function start() {
-        println("<h2>Processing data segments, please wait</h2>"); //Tell user to wait
+        output("<h2>Processing data segments, please wait</h2>"); //Tell user to wait
         capture = []; //initialize
         loaderWrapper.style = "box-shadow: 1px 1px #888;display: none;width: 290px;height: 1.3em;margin-right: 6px;border: 1px solid #BBB;background: #FFF none repeat scroll 0% 0%;font-size: 12px;text-align: left;z-index: 0;position: absolute;top: 110px;left: 0px;margin-left: 14px;";
         disableControls();
 
-        queryElevation(minLat, minLng, maxLng, fetchSlice);
+        queryElevation(fetchSlice);
 
-
-        timerId = setInterval(function () {
-            if (capture.length >= slices) {
-                searchBox.setBounds(null);
+        timerId = setInterval(function () { //Capture between intervals to avoid query limit
+            if (capture.length >= slices) { //
+                placesSearch.setBounds(null);
                 sendData(capture);
                 end();
             }
@@ -118,25 +131,18 @@ var Capture = (function () {
         }, 800);
     }
 
-    function initMap() {
-
-        elevator = new google.maps.ElevationService(); //Define elevation service
-        map = new google.maps.Map(document.getElementById('map-canvas'), MAP_OPTIONS); //Create Map Object
-        infoWindow = new google.maps.InfoWindow(); // Define an info window on the map.
-        drawingManager = new google.maps.drawing.DrawingManager(DRAW_OPTIONS); // Create Drawing Manager
-        searchBox = new google.maps.places.SearchBox(searchbar);// Create the search box and link it to the UI element.;
 
 
-
+    function initEvents() {
         // Bias the SearchBox results towards current map's viewport.
         map.addListener('bounds_changed', function () {
-            searchBox.setBounds(map.getBounds());
+            placesSearch.setBounds(map.getBounds());
         });
 
         // Listen for the event fired when the user selects a prediction and retrieve
         // more details for that place.
-        searchBox.addListener('places_changed', function () {
-            var places = searchBox.getPlaces();
+        placesSearch.addListener('places_changed', function () {
+            var places = placesSearch.getPlaces();
             if (places.length == 0) {
                 return;
             }
@@ -153,16 +159,6 @@ var Capture = (function () {
             map.fitBounds(bounds);
         });
 
-
-        //Add buttons to control bar
-        map.controls[google.maps.ControlPosition.LEFT_TOP].push(textOutput);
-        map.controls[google.maps.ControlPosition.TOP_CENTER].push(captureBtn);
-        map.controls[google.maps.ControlPosition.TOP_CENTER].push(abortBtn);
-        map.controls[google.maps.ControlPosition.LEFT_TOP].push(loaderWrapper);
-        map.controls[google.maps.ControlPosition.TOP_LEFT].push(searchbar);
-        map.controls[google.maps.ControlPosition.BOTTOM_CENTER].push(leftInfo); //Bottom Center Text
-        drawingManager.setMap(map); // Loading the drawing Tool in the Map.
-
         //Rectangle Draw Complete Event
         google.maps.event.addListener(drawingManager, 'overlaycomplete', function (event) {
             if (event.type == google.maps.drawing.OverlayType.RECTANGLE) {
@@ -170,7 +166,7 @@ var Capture = (function () {
                 rectangle = event.overlay;
                 setBounds();
                 setDimensions();
-                captureBtn.style.display = "block";
+                $capture.style.display = "block";
                 showAspectRatio();
                 rectangle.addListener('bounds_changed', function () {
                     showAspectRatio();
@@ -186,18 +182,25 @@ var Capture = (function () {
                 rectangle.setMap(null);
                 rectangle = null;
                 toggleStartButton();
-                textOutput.innerHTML = '<h1>Click and Drag to Select Area<h1>';
+                $output.innerHTML = '<h1>Click and Drag to Select Area<h1>';
             }
         });
-        textOutput.innerHTML = '<h1>Click and Drag to Select Area<h1>';
+        $output.innerHTML = '<h1>Click and Drag to Select Area<h1>';
     }
 
+    /**
+     * Send captured data to model
+     * @param capture
+     */
     function sendData(capture) {
         sessionStorage.setItem('csv', capture);
         window.location = "Gaia_load.html";
     }
 
-    function setBounds() { //Set rectangle bounds
+    /**
+     * Set rectangle bounds
+     */
+    function setBounds() {
         var ne = rectangle.getBounds().getNorthEast().toJSON(),
             sw = rectangle.getBounds().getSouthWest().toJSON();
         minLat = sw.lat;
@@ -206,6 +209,10 @@ var Capture = (function () {
         maxLng = ne.lng;
     }
 
+    /**
+     * Prepare grid coordinates
+     * @returns {Array}
+     */
     function setCoordinates() { // Prepare Array of elevations  at each position in grid
         for (var points = [], i = 0, j, y, x; i < ROWS_PER_SLICE; i++) {   // for each row of the slice
             y = maxLat - (spacing * i);      // calculate the y geographical value
@@ -217,7 +224,12 @@ var Capture = (function () {
         return points;
     }
 
-    function fetchElevation(results) { // Fetch results into elevation array
+    /**
+     * Fetch elevations array from results
+     * @param results
+     * @returns {Array}
+     */
+    function fetchElevation(results) {
         var elevation = [];
         if (capture.length <= 0) { //start by storing limits
             elevation.push(minLng.toFixed(5), maxLng.toFixed(5), minLat.toFixed(5), numberOfRows, COLS);  // site limits, rows, cols
@@ -241,15 +253,19 @@ var Capture = (function () {
     function handleErrors(status) {
         clearInterval(timerId);
         enableControls();
-        typeof status != 'undefined' ? println('<br><br><h2>Elevation service failed due to: ' + status + ', Please try Again<h2>')
-            : println('<br><br><h2>No Results Found, Please try Again<h2>');
+        typeof status != 'undefined' ? output('<br><br><h2>Elevation service failed due to: ' + status + ', Please try Again<h2>')
+            : output('<br><br><h2>No Results Found, Please try Again<h2>');
     }
 
-// https://developers.google.com/maps/documentation/javascript/examples/elevation-simple
-    function queryElevation(minLat, minLng, maxLng, callback) { // query Gmaps n feed array
-        elevator.getElevationForLocations({'locations': setCoordinates()}, function (results, status) {
+
+    /**
+     * Query Google Maps & Feed Array of elevations
+     * https://developers.google.com/maps/documentation/javascript/examples/elevation-simple
+     */
+    function queryElevation() { // query Gmaps n feed array
+        elevationApi.getElevationForLocations({'locations': setCoordinates()}, function (results, status) {
             status == google.maps.ElevationStatus.OK ?
-                (results ? callback(fetchElevation(results)) : handleErrors()) //Fetch data or show no results
+                (results ? fetchElevation(results) : handleErrors()) //Fetch data or show no results
                 : handleErrors(status); //Error status
         });
     }
@@ -258,8 +274,8 @@ var Capture = (function () {
      * Output text in top left corner
      * @param message
      */
-    function println(message) {
-        textOutput.innerHTML = textOutput.innerHTML + message;
+    function output(message) {
+        $output.innerHTML = $output.innerHTML + message;
     }
 
     /**
@@ -277,13 +293,13 @@ var Capture = (function () {
     function enableControls() {
         loader.hide();
         drawingManager.setOptions({drawingControl: true});
-        abortBtn.style.display = "none";
-        captureBtn.style.display = "block";
+        $abort.style.display = "none";
+        $capture.style.display = "block";
         rectangle.setMap(null);
         rectangle.draggable = true;
         rectangle.editable = true;
         rectangle.setMap(map);
-        searchbar.style.display = "block";
+        $searchBar.style.display = "block";
         showAspectRatio();
     }
 
@@ -294,9 +310,9 @@ var Capture = (function () {
         loader.start(slices);
         drawingManager.setDrawingMode(null);
         drawingManager.setOptions({drawingControl: false});
-        captureBtn.style.display = "none";
-        abortBtn.style.display = "block";
-        searchbar.style.display = "none";
+        $capture.style.display = "none";
+        $abort.style.display = "block";
+        $searchBar.style.display = "none";
         rectangle.setMap(null);
         rectangle.editable = false;
         rectangle.draggable = false;
@@ -307,7 +323,7 @@ var Capture = (function () {
      * Toggle Start Capture Button
      */
     function toggleStartButton() {
-        rectangle ? captureBtn.style.display = "none" : captureBtn.style.display = "block";
+        rectangle ? $capture.style.display = "none" : $capture.style.display = "block";
     }
 
     /**
